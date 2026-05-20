@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fastsparselssvm"
+version = "0.1.0"
+description = "New methods of fast and sparse training in Least Squares Support Vector Machine (LSSVM)"
+requires-python = ">=3.11"
+dependencies = [
+    "scikit-learn>=1.2.0",
+    "torch>=2.0.0",
+    "numpy>=1.24.0",
+    "dotenv>=0.19.0",
+    "pandas>=3.0.2",
+    "pydantic>=2.13.2"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "black>=23.0.0",
+    "isort>=5.12.0",
+]
