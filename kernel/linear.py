@@ -4,6 +4,8 @@ utilizando o kernel linear'''
 #-----------------------------------------
 # Carregando pacotes relevantes
 #-----------------------------------------
+from typing import Dict, Optional
+
 import numpy.typing as nptype
 from kernel.base import Kernel
 
@@ -12,7 +14,8 @@ class LinearKernel(Kernel):
       produtos internos em kernel linear'''
     def compute(self, 
                 X: nptype.NDArray,
-                Y: nptype.NDArray = None)-> nptype.NDArray:
+                Y: nptype.NDArray = None,
+                kernel_params: Optional[Dict[str, float]] = None)-> nptype.NDArray:
         if Y is None:
             Y = X
         return X @ Y.T

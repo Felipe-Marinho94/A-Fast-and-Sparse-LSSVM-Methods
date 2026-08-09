@@ -37,6 +37,7 @@ class ThreeTermConjugateSMOClassifier(Model):
             y: nptype.NDArray,
             tolerance: float = 0.001,
             max_iterations: int = 100,
+            Nr: int = 10,
             percentage: float = 0.1)-> Dict[str, nptype.NDArray | list[float]]:
         '''
         Interface do método
@@ -47,10 +48,9 @@ class ThreeTermConjugateSMOClassifier(Model):
         INPUT:
         X: Matriz de features (array N x p);
         y: Vetor de target (array N x 1);
-        gamma: termo de regularização de Tichonov (escalar)
-        kernel: função de kernel utilizada (string: "linear", "polinomial", "gaussiano");
-        epsilon: Tolerância (Critério de parada)
-        N: Número máximo de iterações
+        Nr: Número de vetores de suporte a serem removidos a cada iteração (escalar)
+        tolerance: Tolerância (Critério de parada)
+        max_iterations: Número máximo de iterações
         percentage: Percentual de poda via ganho funcional
         
         OUTPUT:

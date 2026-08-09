@@ -16,5 +16,5 @@ KERNEL_REGISTRY = {
 def build_kernel(kernel: str, **kernel_params):
     '''Função de construção de kernels'''
     if kernel.lower() not in list(KERNEL_REGISTRY.keys()):
-        ValueError(f'Kernel {kernel} não regitrado. Disponíveis: {list(KERNEL_REGISTRY)}')
+        raise ValueError(f'Kernel {kernel} não registrado. Disponíveis: {list(KERNEL_REGISTRY)}')
     return KERNEL_REGISTRY[kernel.lower()](**kernel_params)

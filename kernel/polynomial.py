@@ -4,16 +4,19 @@ produto interno no kernel polinomial'''
 #-----------------------------------------
 # Carregando pacotes relevantes
 #-----------------------------------------
+from typing import Dict, Optional
+
 import numpy.typing as nptype
 from kernel.base import Kernel
 
 class PolynomialKernel(Kernel):
     '''classe concreta para o cálculo de produtos internos
     em kernel polinomial'''
-    def __init__(self, C: int = 1, degree: int = 3)-> None:
+    def __init__(self, kernel_params: Optional[Dict[str, float]] = None)-> None:
         super().__init__()
-        self.C = C
-        self.degree = degree
+        kernel_params = kernel_params or {}
+        self.C = kernel_params.get('C', 1)
+        self.degree = kernel_params.get('degree', 3)
 
     def compute(self,
                 X: nptype.NDArray,

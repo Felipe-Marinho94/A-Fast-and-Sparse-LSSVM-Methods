@@ -4,14 +4,17 @@ em kernel gaussianos'''
 #-------------------------------------
 # Carregando pacotes relevantes
 #-------------------------------------
+from typing import Dict, Optional
+
 import numpy as np
 import numpy.typing as nptype
 from kernel.base import Kernel
 
 class RBFKernel(Kernel):
-    def __init__(self, sigma: float = 0.5)-> None:
+    def __init__(self, kernel_params: Optional[Dict[str, float]] = None)-> None:
         super().__init__()
-        self.sigma = sigma
+        kernel_params = kernel_params or {}
+        self.sigma = kernel_params.get('sigma', 0.5)
 
     def compute(self,
                 X: nptype.NDArray, 
