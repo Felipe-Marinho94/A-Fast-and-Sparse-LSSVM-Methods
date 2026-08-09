@@ -18,7 +18,7 @@ from models.dual.TCSMO_LSSVM.utils import FGWSS
 #-------------------------------------------------------------------------------------------
 class ThreeTermConjugateSMOClassifier(Model):
     '''Classe para implementação do classificador Three Term
-    Conjugate LSSVM'''
+    Conjugate LSSVM com poda via ganho funcional'''
     def __init__(self, 
                  tikhonov_regularization: float = 2,
                  kernel: str ="rbf",
@@ -36,7 +36,8 @@ class ThreeTermConjugateSMOClassifier(Model):
             X: nptype.NDArray,
             y: nptype.NDArray,
             tolerance: float = 0.001,
-            max_iterations: int = 100)-> Dict[str, nptype.NDArray]:
+            max_iterations: int = 100,
+            percentage: float = 0.1)-> Dict[str, nptype.NDArray | list[float]]:
         '''
         Interface do método
         Ação: Este método visa realizar o ajuste do modelo LSSVM empregando
@@ -50,7 +51,8 @@ class ThreeTermConjugateSMOClassifier(Model):
         kernel: função de kernel utilizada (string: "linear", "polinomial", "gaussiano");
         epsilon: Tolerância (Critério de parada)
         N: Número máximo de iterações
-
+        percentage: Percentual de poda via ganho funcional
+        
         OUTPUT:
         vetor ótimo de multiplicadores de Lagrange estimados.
         '''
@@ -129,11 +131,52 @@ class ThreeTermConjugateSMOClassifier(Model):
             #Condição de parada
             if np.abs(np.max(Gradient) - np.min(Gradient)) <= tolerance:
                 break
-            
-        #Resultado
-        resultados = {"lagrange": alphas,
-                      "error": erro}
+
+        # Realização da poda via ganho funcional
+        active: list[int] = list(range(n_samples))
+        inactive: list[int] = []
         
+        #Cálculo do termo F
+        F = -y + K_tilde @ alphas
+
+        #Inicialização do erro na poda
+        erro_pruning: list[float] = []
+
+        while (len(active) >= np.ceil(percentage * n_samples)):
+            
+            #Poda dos Nr vetores de suporte
+            idx_remover: list[int] = np.argsort((1/2) * ((alphas[active] ** 2) * np.diag(K_tilde[np.ix_((active), (active))])) - alphas[active] * F[active])[:Nr-1]
+
+            #Atualização dos índices
+            active = np.array(list(set(active).difference(set(idx_remover))))
+            active = np.squeeze(active)
+            inactive.append(idx_remover)
+
+            #Atualização dos valores de F
+            alphas_inactive = np.zeros(n_samples)
+            alphas_active = np.zeros(n_samples)
+            
+            alphas_inactive[inactive] = alphas[inactive]
+            alphas_active[active] = alphas[active]
+            
+            F = F - K_tilde @ alphas_inactive
+
+            #Cálculo do gradiente com a poda
+            Gradient = K_tilde @ alphas_active - y
+
+            #Tomando o erro
+            erro_new = np.max(Gradient) - np.min(Gradient)
+
+            #Armazenando o erro
+            erro_pruning.append(erro_new)
+
+        #Resultado
+        resultados = {"mult_lagrange": alphas_active,
+                      "erro_pruning": erro_pruning,
+                      "erro": erro,
+                      "idx_suporte": active,
+                      'idx_n_suporte': inactive}
+            
         return resultados
     
     #------------------------------------------------------------------------------

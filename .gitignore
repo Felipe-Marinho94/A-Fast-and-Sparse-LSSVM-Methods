@@ -56,3 +56,6 @@ htmlcov/
 *.pt
 *.pth
 checkpoints/
+
+# Datasets
+data/
