@@ -3,9 +3,6 @@ Implementação de classe para o ajuste (fit) e predict da
 proposta TCSMO_LSSVM
 '''
 
-#-------------------------------------------------------------------------------------------
-#Carregando alguns pacotes relevantes
-#-------------------------------------------------------------------------------------------
 from typing import Dict
 import numpy as np
 import numpy.typing as nptype
@@ -13,9 +10,7 @@ from contracts.base import Model
 from kernel.registry import build_kernel
 from models.dual.TCSMO_LSSVM.utils import FGWSS
 
-#-------------------------------------------------------------------------------------------
-#Implementando a classe
-#-------------------------------------------------------------------------------------------
+
 class ThreeTermConjugateSMOClassifier(Model):
     '''Classe para implementação do classificador Three Term
     Conjugate LSSVM com poda via ganho funcional'''
@@ -60,7 +55,7 @@ class ThreeTermConjugateSMOClassifier(Model):
         n_samples, _ = X.shape 
         K = self.kernel.compute(X)
         
-        #Regularização de Tichonov
+        #Regularização de Tikhonov
         K_tilde = K + (1/self.tikhonov_regularization)*np.diag(np.full(K.shape[0], 1))
         
         #Inicialização
@@ -145,12 +140,12 @@ class ThreeTermConjugateSMOClassifier(Model):
         while (len(active) >= np.ceil(percentage * n_samples)):
             
             #Poda dos Nr vetores de suporte
-            idx_remover: list[int] = np.argsort((1/2) * ((alphas[active] ** 2) * np.diag(K_tilde[np.ix_((active), (active))])) - alphas[active] * F[active])[:Nr-1]
+            idx_remover: list[int] = np.argsort((1/2) * ((alphas[active] ** 2) * np.diag(K_tilde[np.ix_((active), (active))])) - alphas[active] * F[active])[:Nr]
 
             #Atualização dos índices
             active = np.array(list(set(active).difference(set(idx_remover))))
             active = np.squeeze(active)
-            inactive.append(idx_remover)
+            inactive.extend(idx_remover)
 
             #Atualização dos valores de F
             alphas_inactive = np.zeros(n_samples)
@@ -170,6 +165,9 @@ class ThreeTermConjugateSMOClassifier(Model):
             #Armazenando o erro
             erro_pruning.append(erro_new)
 
+        self.X_treino = X
+        self.alphas = alphas_active
+
         #Resultado
         resultados = {"mult_lagrange": alphas_active,
                       "erro_pruning": erro_pruning,
@@ -184,16 +182,6 @@ class ThreeTermConjugateSMOClassifier(Model):
     #problema de classificação
     #------------------------------------------------------------------------------
     def predict(self,
-                lagrange_multipliers: nptype.NDArray[np.float64],
-                X_treino: nptype.NDArray[np.float64],
                 X_teste: nptype.NDArray[np.float64])-> nptype.NDArray[np.float64]:
-        #Inicialização
-        estimado = np.zeros(X_teste.shape[0])
-        
-        #Construção da matriz de Kernel
-        K= self.kernel.compute(X_teste, X_treino)
-        
-        #Cálculo da predição
-        estimado =np.sign(K @ lagrange_multipliers)
 
-        return estimado
+        return np.sign(self.kernel.compute(X_teste, self.X_treino) @ self.alphas)

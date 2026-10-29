@@ -1,8 +1,5 @@
 '''Script para registry dos tipos de kernel'''
 
-#-------------------------------------------
-# Carregando pacotes relevantes
-#-------------------------------------------
 from kernel.linear import LinearKernel
 from kernel.polynomial import PolynomialKernel
 from kernel.rbf import RBFKernel

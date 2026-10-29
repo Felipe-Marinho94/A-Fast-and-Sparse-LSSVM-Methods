@@ -1,9 +1,6 @@
 '''Script para implementação de funções
  utilitárias para o modelo TCSMO_LSSVM'''
 
-#-------------------------------------
-# Carregando pacotes relevantes
-#-------------------------------------
 import numpy as np
 import numpy.typing as nptype
 
@@ -34,6 +31,7 @@ def FGWSS(gradient: nptype.NDArray[np.float64],
 
     numerador = (gradient-gradient[i])**2
     denominador = 2 * (K[i, i] * np.ones(K.shape[0]) + np.diag(K) - K[i, :] - K[:, i])
+    denominador = np.where(np.abs(denominador) < 1e-10, np.inf, denominador)
     quociente = np.ma.array(numerador/denominador, mask=m)
     j = np.argmax(quociente)
 

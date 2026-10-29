@@ -1,17 +1,11 @@
 '''Script para implementação de classes concretas
 para carregamento de dados'''
 
-#---------------------------------------------------
-# Carregando pacotes relevantes
-#---------------------------------------------------
 from pathlib import Path
 import pandas as pd
 from contracts.base import DataLoader, DataSourceConfig
 
 
-#---------------------------------------------------
-# Implementação de classes concretas
-#---------------------------------------------------
 class PandasDataLoader(DataLoader):
     '''Classe concreta para carregamento de arquivos.csv e .xlsx
     em pandas'''

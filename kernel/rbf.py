@@ -1,9 +1,6 @@
 '''Script para a realização de produtos internos
 em kernel gaussianos'''
 
-#-------------------------------------
-# Carregando pacotes relevantes
-#-------------------------------------
 from typing import Dict, Optional
 
 import numpy as np

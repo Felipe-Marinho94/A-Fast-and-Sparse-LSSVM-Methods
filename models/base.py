@@ -1,18 +1,13 @@
 '''Script para implementação abstrações comuns
 a todos os modelos'''
 
-#--------------------------------------------------------
-# Carregando pacotes relevantes
-#--------------------------------------------------------
 from typing import Dict
 import numpy as np
 import numpy.typing as nptype
 from numpy import linalg
 from pydantic import BaseModel
 
-#--------------------------------------------------------
-# Classe construtora do sistema KKT
-#--------------------------------------------------------
+
 class BuildKKTSystem(BaseModel):
     '''Classe construtora de sistemas KKT'''
     kernel_matrix: nptype.NDArray

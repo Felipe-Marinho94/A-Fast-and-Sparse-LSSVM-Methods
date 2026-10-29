@@ -1,9 +1,6 @@
 '''Script para implementação do cálculo de produtos internos
 utilizando o kernel linear'''
 
-#-----------------------------------------
-# Carregando pacotes relevantes
-#-----------------------------------------
 from typing import Dict, Optional
 
 import numpy.typing as nptype

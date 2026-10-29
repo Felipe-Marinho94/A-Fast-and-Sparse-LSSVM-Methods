@@ -2,15 +2,10 @@
 Classe contendo algumas fuções úteis no desenvolvimento de outras classes
 Data:15/11/2024
 '''
-#------------------------------------------------------------------------------
-#Carregando alguns pacotes relevantes
-#------------------------------------------------------------------------------
 import numpy as np
 import numpy.typing as nptype
 
-#---------------------------------------------------------------
-#Funções auxiliares para a proposta SCG-LSSVM algoritmo
-#---------------------------------------------------------------
+
 def FGWSS(grad: nptype.NDArray,
           K_tilde: nptype.NDArray) -> tuple[int, int]:
     '''

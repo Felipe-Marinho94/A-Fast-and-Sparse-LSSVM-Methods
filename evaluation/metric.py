@@ -1,9 +1,6 @@
 '''Script para o cálculo de métricas gerais
 para as tarefas de regressão e classificação'''
 
-#--------------------------------------------------------
-# Carregando pacotes relevantes
-#--------------------------------------------------------
 from typing import Dict, Any
 import numpy as np
 from sklearn.metrics import (
@@ -22,9 +19,7 @@ from sklearn.metrics import (
 )
 from contracts.base import Evaluator, Data
 
-#--------------------------------------------------------
-# Implementação das classes
-#--------------------------------------------------------
+
 class ClassificationEvaluator(Evaluator):
     '''Classe para a avaliação de modelos
     em tarefas de classficação'''

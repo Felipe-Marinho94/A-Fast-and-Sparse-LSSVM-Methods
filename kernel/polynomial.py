@@ -1,9 +1,6 @@
 '''Script para implementação do cálculo do 
 produto interno no kernel polinomial'''
 
-#-----------------------------------------
-# Carregando pacotes relevantes
-#-----------------------------------------
 from typing import Dict, Optional
 
 import numpy.typing as nptype

@@ -3,14 +3,12 @@ Implementação de classe para o ajuste (fit) e predict da
 proposta SCG_LSSVM
 '''
 
-#---------------------------------------------------------------------------
-#Carregando alguns pacotes relevantes
-#---------------------------------------------------------------------------
 from typing import Dict
 
 import numpy as np
 import numpy.typing as nptype
 from sklearn.metrics import accuracy_score
+from sklearn.model_selection import train_test_split
 
 from contracts.base import Model
 from kernel.registry import build_kernel
@@ -28,11 +26,13 @@ class SpectralGradientConjugateClassifier(Model):
     '''Classe para implementação do regressor Spectral Gradient
     Conjugate LSSVM com poda via ganho funcional'''
     def __init__(self, 
-                 tikhonov_regularization: float = 2,
+                 tikhonov_regularization: float = 0.2,
                  kernel: str ="rbf",
+                 pruning_percentual: float = 0.2,
                  **kernel_params)-> None:
             self.tikhonov_regularization = tikhonov_regularization
             self.kernel = build_kernel(kernel=kernel, kernel_params=kernel_params)
+            self.pruning_percentual = pruning_percentual
 
     #---------------------------------------------------------------
     #Função para ajustar o modelo LSSVM utilizando um novo método dos
@@ -42,10 +42,9 @@ class SpectralGradientConjugateClassifier(Model):
     def fit(self,
             X: nptype.NDArray,
             y: nptype.NDArray,
-            X_valid: nptype.NDArray,
-            y_valid: nptype.NDArray,
             tolerance: float = 0.001,
-            max_iterations: int = 100)-> Dict[str, nptype.NDArray | list[float]]:
+            max_iterations: int = 100,
+            validation_split: float = 0.2)-> Dict[str, nptype.NDArray | list[float]]:
         '''
             Interface do método
             Ação: Este método visa realizar o ajuste do modelo LSSVM empregando
@@ -64,11 +63,14 @@ class SpectralGradientConjugateClassifier(Model):
             vetor ótimo de multiplicadores de Lagrange estimados.
         '''
 
+        # Obtenção dos X_valid e y_valid
+        X, X_valid, y, y_valid = train_test_split(X, y, test_size=validation_split, stratify=y)
+        
         #Construindo a matriz de kernel
         n_samples, _ = X.shape 
         K = self.kernel.compute(X)
                 
-        #Regularização de Tichonov
+        #Regularização de Tikhonov
         K_tilde = K + (1/self.tikhonov_regularization)*np.diag(np.full(K.shape[0], 1))
 
         #Inicialização dos multiplicadores Lagrange
@@ -107,7 +109,7 @@ class SpectralGradientConjugateClassifier(Model):
             g = measure(X, y, K_tilde, alphas)
 
             #Selecionando os padrões mais próximos
-            active = np.argsort(np.abs(g))[: int(np.ceil(self.P * n_samples))]
+            active = np.argsort(np.abs(g))[: int(np.ceil(self.pruning_percentual * n_samples))]
             
             alphas[active] = alphas[active] + rho * s[active]
             gradiente = gradient(alphas, K_tilde, y)
@@ -117,10 +119,10 @@ class SpectralGradientConjugateClassifier(Model):
 
             #-----------------------------------------------------------
             #Avaliação da condição de parada da poda iterativa
-            #-----------------------------------------------------------
+            #----------------------------------------------------------
             #Cálculo da saída estimada
-            y_hat_anterior = self.predict(alphas_anterior, X, X_valid)
-            y_hat = self.predict(alphas, X, X_valid)
+            y_hat_anterior = self._predict_with(alphas_anterior, X, X_valid)
+            y_hat = self._predict_with(alphas, X, X_valid)
 
             #Determinação da acurácia
             acc_anterior = accuracy_score(y_hat_anterior, y_valid)
@@ -157,6 +159,9 @@ class SpectralGradientConjugateClassifier(Model):
             #Incremento
             k = k + 1
 
+        self.X_train = X
+        self.alphas = alphas
+
         #Resultados
         resultados = {"mult_lagrange": alphas,
                     "erro": erro,
@@ -177,16 +182,13 @@ class SpectralGradientConjugateClassifier(Model):
     #problema de classificação
     #------------------------------------------------------------------------------
     def predict(self,
-                lagrange_multipliers: nptype.NDArray[np.float64],
-                X_treino: nptype.NDArray[np.float64],
-                X_teste: nptype.NDArray[np.float64])-> nptype.NDArray[np.float64]:
-        #Inicialização
-        estimado = np.zeros(X_teste.shape[0])
-            
-        #Construção da matriz de Kernel
-        K= self.kernel.compute(X_teste, X_treino)
-            
-        #Cálculo da predição
-        estimado =np.sign(K @ lagrange_multipliers)
+                X_teste: nptype.NDArray[np.float64]) -> nptype.NDArray[np.float64]:
     
-        return estimado
+        return self._predict_with(self.alphas, self.X_train, X_teste)
+
+    def _predict_with(self,
+                      alphas: nptype.NDArray,
+                      X_treino: nptype.NDArray,
+                      X_teste: nptype.NDArray) -> nptype.NDArray:
+        '''Método auxiliar para predição com alphas específicos'''
+        return np.sign(self.kernel.compute(X_teste, X_treino) @ alphas)

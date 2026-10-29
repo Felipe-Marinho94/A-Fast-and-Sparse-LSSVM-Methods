@@ -1,17 +1,11 @@
 '''Script para desenvolvimento de abstrações/contratos
 dos elementos do projeto'''
 
-#--------------------------------------------------------
-# Carregando pacotes relevantes
-#--------------------------------------------------------
 from abc import ABC, abstractmethod
 from typing import TypeVar, Any, Dict, Optional
 from dataclasses import dataclass
 
 
-#--------------------------------------------------------
-# Implementação das classes abstratas
-#--------------------------------------------------------
 Data = TypeVar('Data')
 Output = TypeVar('Output')
 

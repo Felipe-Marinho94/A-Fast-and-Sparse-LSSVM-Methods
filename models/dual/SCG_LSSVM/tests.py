@@ -35,9 +35,9 @@ model_SCG_LSSVM = SpectralGradientConjugateClassifier()
 model_SVM = SVC(kernel = 'rbf', gamma = 1, C = 1)
 resultados = model_SCG_LSSVM.fit(X, y)
 resultados_SVM = model_SVM.fit(X, y)
-alphas = resultados["lagrange"]
+alphas = resultados["mult_lagrange"]
 alphas
-y_hat = model_SCG_LSSVM.predict(alphas, X, X)
+y_hat = model_SCG_LSSVM.predict(X)
 y_hat_SVM = model_SVM.predict(X)
 accuracy = accuracy_score(y, y_hat)
 accuracy
@@ -65,11 +65,11 @@ X_train, X_test, y_train, y_test = train_test_split(X_breast,
 model_SCG_LSSVM = SpectralGradientConjugateClassifier()
 resultados = model_SCG_LSSVM.fit(X_train, y_train)
 resultados_SVM = model_SVM.fit(X_train, y_train)
-alphas = resultados["lagrange"]
+alphas = resultados["mult_lagrange"]
 alphas
 
 # Predição e avaliação
-y_hat = model_SCG_LSSVM.predict(alphas, X_train, X_test)
+y_hat = model_SCG_LSSVM.predict(X_test)
 y_hat_SVM = model_SVM.predict(X_test)
 accuracy = accuracy_score(y_test, y_hat)
 accuracy

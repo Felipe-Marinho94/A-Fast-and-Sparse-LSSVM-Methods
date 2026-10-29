@@ -1,19 +1,12 @@
 '''Script para adição de funções de pré-processamento
 que podem ser adicionadas na pipeline'''
 
-#----------------------------------------
-# Carregando pacotes relevantes
-#----------------------------------------
 from typing import List, Any, TypeVar
 import numpy as np
 import numpy.typing as nptype
 import pandas as pd
 
 
-#----------------------------------------
-# Implementação de funções de
-# pré-processamento
-#----------------------------------------
 # Análise Univariada
 def drop_nan(df: pd.DataFrame)-> pd.DataFrame:
     '''Remove registros (linhas) com valores nulos
