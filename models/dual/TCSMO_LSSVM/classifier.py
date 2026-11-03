@@ -33,7 +33,7 @@ class ThreeTermConjugateSMOClassifier(Model):
             tolerance: float = 0.001,
             max_iterations: int = 100,
             Nr: int = 10,
-            percentage: float = 0.1)-> Dict[str, nptype.NDArray | list[float]]:
+            percentage: float = 0.05)-> Dict[str, nptype.NDArray | list[float]]:
         '''
         Interface do método
         Ação: Este método visa realizar o ajuste do modelo LSSVM empregando
@@ -140,12 +140,12 @@ class ThreeTermConjugateSMOClassifier(Model):
         while (len(active) >= np.ceil(percentage * n_samples)):
             
             #Poda dos Nr vetores de suporte
-            idx_remover: list[int] = np.argsort((1/2) * ((alphas[active] ** 2) * np.diag(K_tilde[np.ix_((active), (active))])) - alphas[active] * F[active])[:Nr]
+            idx_remover = np.argsort((1/2) * ((alphas[active] ** 2) * np.diag(K_tilde[np.ix_((active), (active))])) - alphas[active] * F[active])[:Nr-1]
 
             #Atualização dos índices
             active = np.array(list(set(active).difference(set(idx_remover))))
             active = np.squeeze(active)
-            inactive.extend(idx_remover)
+            inactive.append(idx_remover)
 
             #Atualização dos valores de F
             alphas_inactive = np.zeros(n_samples)
@@ -165,15 +165,19 @@ class ThreeTermConjugateSMOClassifier(Model):
             #Armazenando o erro
             erro_pruning.append(erro_new)
 
+            #or (np.linalg.norm(erro_new - erro_anterior) >= 10)
+            #Atualização do erro anterior
+            erro_anterior = erro_new
+
         self.X_treino = X
         self.alphas = alphas_active
-
+        
         #Resultado
         resultados = {"mult_lagrange": alphas_active,
-                      "erro_pruning": erro_pruning,
-                      "erro": erro,
-                      "idx_suporte": active,
-                      'idx_n_suporte': inactive}
+                    "erro_pruning": erro_pruning,
+                    "erro": erro,
+                    "idx_suporte": active,
+                    'idx_n_suporte': inactive}
             
         return resultados
     
