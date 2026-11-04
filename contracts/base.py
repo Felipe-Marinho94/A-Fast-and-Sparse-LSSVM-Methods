@@ -34,3 +34,15 @@ class DataLoader(ABC):
     '''Abstração/Contrato para carregamento de dados'''
     @abstractmethod
     def load_data(self, config: DataSourceConfig)-> Data:...
+
+
+class Optimizer(ABC):
+    '''Abstração/Contrato para implementação de otimizadores'''
+    @abstractmethod
+    def optimize(self, optimize_options: Optional[dict[str, Any]] = None)-> Output:...
+
+
+class Factorizer(ABC):
+    '''Abstração/Contrato para fatoração de matrizes'''
+    @abstractmethod
+    def factorize(self, matrix: Data)-> Output:...
