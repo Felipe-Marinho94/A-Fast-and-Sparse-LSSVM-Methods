@@ -57,6 +57,7 @@ Key characteristics:
 ---
 
 ## Repository Structure
+```
 .
 ├── data/ # Example datasets
 ├── experiments/ # Experimental scripts
@@ -66,6 +67,7 @@ Key characteristics:
 ├── utils/ # Helper functions
 ├── notebooks/ # Demonstrations
 └── README.md
+```
 
 ---
 
