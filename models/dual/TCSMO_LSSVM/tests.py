@@ -16,7 +16,7 @@ from models.dual.TCSMO_LSSVM.classifier import ThreeTermConjugateSMOClassifier
 #Base sintética pseudoaleatória
 style.use("fivethirtyeight")
  
-X, y = make_blobs(n_samples = 1000, centers = 2, 
+X, y = make_blobs(n_samples = 10000, centers = 2, 
                cluster_std = 4, n_features = 10)
  
 
@@ -35,9 +35,9 @@ model_TCSMO_LSSVM = ThreeTermConjugateSMOClassifier()
 model_SVM = SVC(kernel = 'rbf', gamma = 1, C = 1)
 resultados = model_TCSMO_LSSVM.fit(X, y)
 resultados_SVM = model_SVM.fit(X, y)
-alphas = resultados["lagrange"]
+alphas = resultados["mult_lagrange"]
 alphas
-y_hat = model_TCSMO_LSSVM.predict(alphas, X, X)
+y_hat = model_TCSMO_LSSVM.predict(X)
 y_hat_SVM = model_SVM.predict(X)
 accuracy = accuracy_score(y, y_hat)
 accuracy
@@ -63,13 +63,13 @@ X_train, X_test, y_train, y_test = train_test_split(X_breast,
 
 # Treinamento do modelo TCSMO_LSSVM
 model_TCSMO_LSSVM = ThreeTermConjugateSMOClassifier()
-resultados = model_TCSMO_LSSVM.fit(X_train, y_train)
+resultados = model_TCSMO_LSSVM.fit(X_train, y_train, max_iterations=1000, percentage=0.2, tolerance=0.0001)
 resultados_SVM = model_SVM.fit(X_train, y_train)
-alphas = resultados["lagrange"]
+alphas = resultados["mult_lagrange"]
 alphas
 
 # Predição e avaliação
-y_hat = model_TCSMO_LSSVM.predict(alphas, X_train, X_test)
+y_hat = model_TCSMO_LSSVM.predict(X_test)
 y_hat_SVM = model_SVM.predict(X_test)
 accuracy = accuracy_score(y_test, y_hat)
 accuracy

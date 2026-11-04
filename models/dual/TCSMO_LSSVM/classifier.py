@@ -33,11 +33,11 @@ class ThreeTermConjugateSMOClassifier(Model):
             tolerance: float = 0.001,
             max_iterations: int = 100,
             Nr: int = 10,
-            percentage: float = 0.05)-> Dict[str, nptype.NDArray | list[float]]:
+            percentage: float = 0.7)-> Dict[str, nptype.NDArray | list[float]]:
         '''
         Interface do método
         Ação: Este método visa realizar o ajuste do modelo LSSVM empregando
-        a metodologia CFGSMO, retornando os multiplicadores de lagrange
+        a metodologia TCSMO, retornando os multiplicadores de lagrange
         ótimos para o problema de otimização.
 
         INPUT:
@@ -127,6 +127,9 @@ class ThreeTermConjugateSMOClassifier(Model):
             if np.abs(np.max(Gradient) - np.min(Gradient)) <= tolerance:
                 break
 
+            # Incremento
+            k += 1
+
         # Realização da poda via ganho funcional
         active: list[int] = list(range(n_samples))
         inactive: list[int] = []
@@ -138,36 +141,26 @@ class ThreeTermConjugateSMOClassifier(Model):
         erro_pruning: list[float] = []
 
         while (len(active) >= np.ceil(percentage * n_samples)):
-            
-            #Poda dos Nr vetores de suporte
-            idx_remover = np.argsort((1/2) * ((alphas[active] ** 2) * np.diag(K_tilde[np.ix_((active), (active))])) - alphas[active] * F[active])[:Nr-1]
+    
+            idx_remover = np.argsort((1/2) * ((alphas[active] ** 2) * np.diag(K_tilde[np.ix_(active, active)]))- alphas[active] * F[active])[:Nr-1]
 
-            #Atualização dos índices
-            active = np.array(list(set(active).difference(set(idx_remover))))
-            active = np.squeeze(active)
-            inactive.append(idx_remover)
+            # Converte para índices globais antes de tudo
+            removed_global = np.array(active)[idx_remover]
 
-            #Atualização dos valores de F
-            alphas_inactive = np.zeros(n_samples)
+            active = np.array(list(set(active).difference(set(removed_global))))
+            inactive.extend(removed_global.tolist())
+
+            # Atualiza F subtraindo APENAS os recém-removidos
+            alphas_removed = np.zeros(n_samples)
+            alphas_removed[removed_global] = alphas[removed_global]
+            F = F - K_tilde @ alphas_removed
+
             alphas_active = np.zeros(n_samples)
-            
-            alphas_inactive[inactive] = alphas[inactive]
             alphas_active[active] = alphas[active]
-            
-            F = F - K_tilde @ alphas_inactive
 
-            #Cálculo do gradiente com a poda
             Gradient = K_tilde @ alphas_active - y
+            erro_pruning.append(np.max(Gradient) - np.min(Gradient))
 
-            #Tomando o erro
-            erro_new = np.max(Gradient) - np.min(Gradient)
-
-            #Armazenando o erro
-            erro_pruning.append(erro_new)
-
-            #or (np.linalg.norm(erro_new - erro_anterior) >= 10)
-            #Atualização do erro anterior
-            erro_anterior = erro_new
 
         self.X_treino = X
         self.alphas = alphas_active
