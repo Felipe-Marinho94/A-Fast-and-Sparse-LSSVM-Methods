@@ -10,10 +10,6 @@ from numpy.linalg import cholesky
 
 from contracts.base import Optimizer
 
-REGISTRY_GRADIENTS: dict[str, callable] = {
-    'default': '_default',
-    'conditioned': '_conditioned'
-}
 
 class ConjugateGradients(Optimizer):
     '''Classe concreta para implementação do método de
@@ -27,12 +23,16 @@ class ConjugateGradients(Optimizer):
         self.tolerance = tolerance
         self.algorithm = algorithm
 
+
     def optimize(self,
                  A: NDArray,
                  b: NDArray,
                  x: NDArray,
                  epsilon: float):
-        return getattr(self, REGISTRY_GRADIENTS[self.algorithm])(A, b, epsilon)
+        if self.algorithm == 'default':
+            return self._default(A, b, epsilon)
+        return self._conditioned(A, x, b, epsilon)
+
 
     def _default(A: NDArray, b: NDArray, epsilon: float) -> NDArray:
         '''
@@ -66,6 +66,7 @@ class ConjugateGradients(Optimizer):
             r += -lamb * A.dot(p)
             
         return x
+    
 
     def _conditioned(self,
                      A: NDArray,

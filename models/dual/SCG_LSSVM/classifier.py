@@ -6,7 +6,7 @@ proposta SCG_LSSVM
 from typing import Dict
 
 import numpy as np
-import numpy.typing as nptype
+from numpy.typing import NDArray
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 
@@ -182,13 +182,13 @@ class SpectralGradientConjugateClassifier(Model):
     #problema de classificação
     #------------------------------------------------------------------------------
     def predict(self,
-                X_teste: nptype.NDArray[np.float64]) -> nptype.NDArray[np.float64]:
+                X_teste: NDArray[np.float64])-> NDArray[np.float64]:
     
         return self._predict_with(self.alphas, self.X_train, X_teste)
 
     def _predict_with(self,
-                      alphas: nptype.NDArray,
-                      X_treino: nptype.NDArray,
-                      X_teste: nptype.NDArray) -> nptype.NDArray:
+                      alphas: NDArray,
+                      X_treino: NDArray,
+                      X_teste: NDArray)-> NDArray:
         '''Método auxiliar para predição com alphas específicos'''
         return np.sign(self.kernel.compute(X_teste, X_treino) @ alphas)

@@ -1,4 +1,4 @@
-'''Script de testes para o modelo TCSMO_LSSVM'''
+'''Script de testes para o modelo SCG_LSSVM'''
 
 #-------------------------------------
 # Carregando pacotes relevantes

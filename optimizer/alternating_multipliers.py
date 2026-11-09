@@ -1,6 +1,6 @@
 '''Script com a s funções utilitárias para o modelo
 LSSVM_ADMM'''
-from typing import Any, Literal
+from typing import Any, Literal, Optional
 
 import numpy as np
 from numpy.typing import NDArray
@@ -9,23 +9,21 @@ from math import sqrt, log
 from contracts.base import Optimizer
 
 
-REGISTRY: dict[str, callable] = {
-    'ADMM': 'ADMM',
-    'Fast_ADMM': 'Fast_ADMM',
-    'Fast_ADMM_restart': 'Fast_ADMM_restart'
-}
-
 class AlternatingDirectionsMultipliers(Optimizer):
     '''classe para implementação '''
 
     def __init__(self,
-                 gamma: float = 1e-8,
-                 algorithm: Literal['ADMM', 'Fast_ADMM', 'Fast_ADMM_restart'] = 'ADMM'):
+                 algorithm: Literal['ADMM', 'Fast_ADMM', 'Fast_ADMM_restart'] = 'ADMM',
+                 l: Optional[float] = None,
+                 rho: Optional[float] = None) -> None:
         self.algorithm = algorithm
-        self.gamma = gamma
+        self.l = l
+        self.rho = rho
+        
 
-    def _Sthresh(self, x: NDArray) -> float:
-        return np.sign(x)*np.maximum(0, np.absolute(x)-self.gamma/2.0)
+    def _Sthresh(self, x: NDArray, gamma: float) -> float:
+        return np.sign(x)*np.maximum(0, np.absolute(x)-gamma/2.0)
+
     
     def ADMM(self,
              A: NDArray,
@@ -42,8 +40,8 @@ class AlternatingDirectionsMultipliers(Optimizer):
         u = np.zeros([n, 1])
 
         "Calcular os coeficientes e tamanho do passo"
-        l = sqrt(2*log(n, 10))
-        rho = 1/(np.amax(np.absolute(w)))
+        l   = self.l   if self.l   is not None else sqrt(2*log(n, 10))
+        rho = self.rho if self.rho is not None else 1/(np.amax(np.absolute(w)))
 
         "Pre-cácula para salva tais operações"
         AtA = A.T.dot(A)
@@ -66,7 +64,7 @@ class AlternatingDirectionsMultipliers(Optimizer):
 
             i = i+1
         return zhat, rho, l
-    
+
     
     def Fast_ADMM(self,
                   A: NDArray,
@@ -198,7 +196,7 @@ class AlternatingDirectionsMultipliers(Optimizer):
             return zhat, rho, l
 
 
-    def optimizer(self, A: NDArray, y: NDArray, **kwargs: Any) -> tuple[Any]:
+    def optimize(self, A: NDArray, y: NDArray, **kwargs: Any) -> tuple[Any]:
         '''função que seleciona o algoritmo a ser utilizado'''
-        func = REGISTRY[self.algorithm]
+        func = getattr(self, self.algorithm)
         return func(A, y, **kwargs)
