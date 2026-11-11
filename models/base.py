@@ -1,24 +1,26 @@
 '''Script para implementação abstrações comuns
 a todos os modelos'''
 
-from typing import Dict
+from typing import Dict, Optional
+
 import numpy as np
-import numpy.typing as nptype
+from numpy.typing import NDArray
 from numpy import linalg
 from pydantic import BaseModel
 
 
 class BuildKKTSystem(BaseModel):
     '''Classe construtora de sistemas KKT'''
-    kernel_matrix: nptype.NDArray
+    kernel_matrix: NDArray
     tikhonov_regularization: float
-    primal_regularization: float
+    primal_regularization: Optional[float] = None
 
-    def build_classfication(self,
-                            X: nptype.NDArray,
-                            y: nptype.NDArray)-> Dict[str, nptype.NDArray]:
+    def build_classification_without_bias(self,
+                            X: NDArray,
+                            y: NDArray)-> Dict[str, NDArray]:
         '''Método para construção do sistema KKT
-        no problema de treinamento de LSSVM's para tarefas de classficação'''
+        no problema de treinamento de LSSVM's para tarefas de classficação
+        sem um termo de bias'''
         
         # Decomposição da matriz de kernel
         P = linalg.cholesky(self.kernel_matrix + 
@@ -34,7 +36,37 @@ class BuildKKTSystem(BaseModel):
         
         return {'A': A, 'B': B}
     
-    def build_regression(self, X: nptype.NDArray, y: nptype.NDArray)-> Dict[str, nptype.NDArray]:
+
+    def build_classification(self,
+                             X: NDArray,
+                             y: NDArray)-> Dict[str, NDArray]:
+        '''Método para construção do sistema KKT
+        no problema de treinamento de LSSVM's para tarefas de classficação'''
+
+        # Construção da matriz dos coeficientes
+        n_samples = X.shape[0]
+
+        #Construção da Matriz Omega
+        Omega = np.zeros((n_samples, n_samples))
+        for i in range(n_samples):
+            for j in range(n_samples):
+                Omega[i, j] = y[i] * y[j] * self.kernel_matrix[i, j]
+                
+        #Construção da Matriz A
+        H = Omega + (1/self.tikhonov_regularization) * np.identity(n_samples)
+        A = np.block([[np.array([0]), np.expand_dims(y, axis = 1).T],
+                      [np.expand_dims(y, axis = 1), H]])
+        
+        #Construção do Vetor B
+        B = np.concatenate((np.expand_dims(np.zeros([1]), axis=1),
+                            np.expand_dims(np.ones(n_samples), axis = 1)), axis=0)
+                
+        return {'A': A, 'B' : B}
+            
+    
+    def build_regression(self,
+                         X: NDArray,
+                         y: NDArray)-> Dict[str, NDArray]:
         '''Método para construção dos sistema KKT no problema de
         treinamento de LSSVM's em tarefas de regressão'''
 
