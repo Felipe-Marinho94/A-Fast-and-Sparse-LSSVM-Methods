@@ -27,7 +27,7 @@ for i in range(len(y)):
     if y[i] == 0:
         y[i] = -1
 
-#SCG_LSSVM
+#ADMM_LSSVM
 model_LSSVM_ADMM = PrimalLassoClassifier()
 model_SVM = SVC(kernel = 'rbf', gamma = 1, C = 1)
 resultados = model_LSSVM_ADMM.fit(X, y)
@@ -57,15 +57,15 @@ X_train, X_test, y_train, y_test = train_test_split(X_breast,
                                                     y_breast,
                                                     test_size=0.2)
 
-# Treinamento do modelo SCG_LSSVM
-model_SCG_LSSVM = SpectralGradientConjugateClassifier()
-resultados = model_SCG_LSSVM.fit(X_train, y_train)
+# Treinamento do modelo ADMM_LSSVM
+model_ADMM_LSSVM = PrimalLassoClassifier()
+resultados = model_ADMM_LSSVM.fit(X_train, y_train)
 resultados_SVM = model_SVM.fit(X_train, y_train)
 alphas = resultados["mult_lagrange"]
 alphas
 
 # Predição e avaliação
-y_hat = model_SCG_LSSVM.predict(X_test)
+y_hat = model_ADMM_LSSVM.predict(X_test)
 y_hat_SVM = model_SVM.predict(X_test)
 accuracy = accuracy_score(y_test, y_hat)
 accuracy

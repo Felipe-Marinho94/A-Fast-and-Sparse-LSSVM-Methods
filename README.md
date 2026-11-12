@@ -23,6 +23,15 @@ The main contributions implemented in this repository are:
 - **SCG-LSSVM**  
   A Spectral Conjugate Gradient approach for solving the dual optimization problem of LSSVM.
 
+  - **FSLM-LSSVM**  
+  A Fixed Sized Levenberg-Marquardt method for iterative pruning of support vectors.
+
+- **RFSLM-LSSVM**  
+  A Reduced Fixed Sized Levenberg-Marquardt method operating on a reduced support vector set.
+
+- **LSSVM-ADMM**  
+  An LSSVM with L1 (LASSO) regularization in the primal, solved via the Alternating Directions Multipliers Method.
+
 Both methods aim to reduce computational complexity while maintaining competitive predictive performance.
 
 ---
@@ -56,14 +65,65 @@ Key characteristics:
 
 ---
 
+### FSLM-LSSVM
+
+Fixed Sized Levenberg-Marquardt method for iterative pruning of LSSVM support vectors, working with the full coefficient matrix at every iteration.
+
+Key characteristics:
+
+- Iterative Levenberg-Marquardt updates in the primal space
+- Gradual pruning of support vectors via a sliding window strategy
+- Configurable pruning percentage and window size
+- Sparse model generation with bias term
+
+---
+
+### RFSLM-LSSVM
+
+Reduced Fixed Sized Levenberg-Marquardt method, extending FSLM-LSSVM by operating on a dynamically updated reduced support vector set.
+
+Key characteristics:
+
+- Works with a reduced subset of support vectors at each iteration
+- Periodic replacement of pruned support vectors with new candidates
+- Reduced memory and computational cost per iteration
+- Configurable reduction rate and window size
+
+---
+
+### LSSVM-ADMM
+
+LSSVM with L1 (LASSO) regularization in the primal formulation, solved via the Alternating Directions Multipliers Method (ADMM).
+
+Key characteristics:
+
+- L1 regularization for automatic sparsity induction
+- ADMM-based optimization of the primal problem
+- Incomplete Cholesky factorization for kernel approximation
+- No bias term in the final solution
+
+---
+
+
 ## Repository Structure
 ```
 .
 ├── data/ # Example datasets
 ├── experiments/ # Experimental scripts
 ├── models/ # LSSVM implementations
-│ ├── tcsmolssvm.py
-│ ├── scglssvm.py
+│ ├── dual/
+│ │ ├── SCG_LSSVM/
+│ │ │ └── classifier.py
+│ │ └── TCSMO_LSSVM/
+│ │ └── classifier.py
+│ ├── primal/
+│ │ ├── FSLM_LSSVM/
+│ │ │ └── classifier.py
+│ │ ├── RFSLM_LSSVM/
+│ │ │ └── classifier.py
+│ │ └── LSSVM_ADMM/
+│ │ └── classifier.py
+│ └── base.py
 ├── utils/ # Helper functions
 ├── notebooks/ # Demonstrations
 └── README.md

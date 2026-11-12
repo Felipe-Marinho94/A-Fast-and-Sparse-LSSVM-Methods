@@ -1,23 +1,24 @@
 '''Script para implementação abstrações comuns
 a todos os modelos'''
 
-from typing import Dict, Optional
+from typing import Optional
 
 import numpy as np
 from numpy.typing import NDArray
 from numpy import linalg
-from pydantic import BaseModel
 
 
-class BuildKKTSystem(BaseModel):
-    '''Classe construtora de sistemas KKT'''
-    kernel_matrix: NDArray
-    tikhonov_regularization: float
-    primal_regularization: Optional[float] = None
+class BuildKKTSystem:
+    def __init__(self, kernel_matrix: NDArray, tikhonov_regularization: float,
+                 primal_regularization: Optional[float] = None) -> None:
+        '''Classe construtora de sistemas KKT'''
+        self.kernel_matrix = kernel_matrix
+        self.tikhonov_regularization = tikhonov_regularization
+        self.primal_regularization = primal_regularization
 
     def build_classification_without_bias(self,
-                            X: NDArray,
-                            y: NDArray)-> Dict[str, NDArray]:
+                                          X: NDArray,
+                                          y: NDArray)-> tuple[NDArray, NDArray]:
         '''Método para construção do sistema KKT
         no problema de treinamento de LSSVM's para tarefas de classficação
         sem um termo de bias'''
@@ -34,12 +35,12 @@ class BuildKKTSystem(BaseModel):
         B = np.dot(linalg.inv(self.primal_regularization * np.identity(X.shape[0]) + np.dot(P.T, P)),
                    np.dot(P.T, y))
         
-        return {'A': A, 'B': B}
+        return A, B
     
 
     def build_classification(self,
                              X: NDArray,
-                             y: NDArray)-> Dict[str, NDArray]:
+                             y: NDArray)-> tuple[NDArray, NDArray]:
         '''Método para construção do sistema KKT
         no problema de treinamento de LSSVM's para tarefas de classficação'''
 
@@ -61,12 +62,12 @@ class BuildKKTSystem(BaseModel):
         B = np.concatenate((np.expand_dims(np.zeros([1]), axis=1),
                             np.expand_dims(np.ones(n_samples), axis = 1)), axis=0)
                 
-        return {'A': A, 'B' : B}
+        return A, B
             
     
     def build_regression(self,
                          X: NDArray,
-                         y: NDArray)-> Dict[str, NDArray]:
+                         y: NDArray)-> tuple[NDArray, NDArray]:
         '''Método para construção dos sistema KKT no problema de
         treinamento de LSSVM's em tarefas de regressão'''
 
@@ -87,7 +88,7 @@ class BuildKKTSystem(BaseModel):
         B = np.concatenate((np.expand_dims(b1, axis = 1), d2), axis = 0)
         B = np.squeeze(B)
 
-        return {'A': A, 'B': B}
+        return A, B
 
 
     

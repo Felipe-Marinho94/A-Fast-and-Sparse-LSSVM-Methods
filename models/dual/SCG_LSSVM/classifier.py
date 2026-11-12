@@ -40,11 +40,11 @@ class SpectralGradientConjugateClassifier(Model):
     #SOURCE: https://journalofinequalitiesandapplications.springeropen.com/articles/10.1186/s13660-020-02375-z
     #---------------------------------------------------------------
     def fit(self,
-            X: nptype.NDArray,
-            y: nptype.NDArray,
+            X: NDArray,
+            y: NDArray,
             tolerance: float = 0.001,
             max_iterations: int = 100,
-            validation_split: float = 0.2)-> Dict[str, nptype.NDArray | list[float]]:
+            validation_split: float = 0.2)-> Dict[str, NDArray | list[float]]:
         '''
             Interface do método
             Ação: Este método visa realizar o ajuste do modelo LSSVM empregando

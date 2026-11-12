@@ -11,7 +11,7 @@ from kernel.registry import build_kernel
 from models.base import BuildKKTSystem
 
 class FixedSizedLMClassifier(Model):
-    '''Classe cconcreta para a implementação do modelo
+    '''Classe concreta para a implementação do modelo
     Fixed Sized Levenberg-Marquardt LSSVM'''
     def __init__(self,
                      tikhonov_regulraization: float = 0.2,
@@ -56,7 +56,6 @@ class FixedSizedLMClassifier(Model):
 
         #Construção da matriz A e vetor b e inicialização aleatória
         #do vetor de multiplicadores de Lagrange
-        
         n_samples, _ = X.shape 
         K = self.kernel.compute(X)
         
@@ -131,8 +130,12 @@ class FixedSizedLMClassifier(Model):
             if np.abs(np.mean(erro_novo**2)) < tolerance:
                 break
 
+        z_flat = z.ravel()
         mult_lagrange = np.zeros(n_samples)
-        mult_lagrange[idx_suporte[len(idx_suporte)-1]] = np.squeeze(z)[1:len(z)]
+        
+        last_idx = np.array(list(idx_suporte[-1]))
+        n_restantes = len(z_flat) - 1  # excluindo o bias
+        mult_lagrange[last_idx[:n_restantes]] = z_flat[1:]
 
         self.X_treino = X
         self.alphas = mult_lagrange

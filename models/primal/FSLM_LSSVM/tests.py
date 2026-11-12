@@ -16,7 +16,7 @@ from models.primal.FSLM_LSSVM.classifier import FixedSizedLMClassifier
 #Base sintética pseudoaleatória
 style.use("fivethirtyeight")
  
-X, y = make_blobs(n_samples = 10000, centers = 2, 
+X, y = make_blobs(n_samples = 100, centers = 2, 
                cluster_std = 4, n_features = 10)
  
 
@@ -33,7 +33,7 @@ for i in range(len(y)):
 #FSLM_LSSVM
 model_FSLM_LSSVM = FixedSizedLMClassifier()
 model_SVM = SVC(kernel = 'rbf', gamma = 1, C = 1)
-resultados = model_FSLM_LSSVM.fit(X, y)
+resultados = model_FSLM_LSSVM.fit(X, y, max_iterations=100)
 resultados_SVM = model_SVM.fit(X, y)
 alphas = resultados["mult_lagrange"]
 alphas
