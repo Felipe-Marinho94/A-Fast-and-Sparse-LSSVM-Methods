@@ -14,10 +14,10 @@ class FixedSizedLMClassifier(Model):
     '''Classe concreta para a implementação do modelo
     Fixed Sized Levenberg-Marquardt LSSVM'''
     def __init__(self,
-                     tikhonov_regulraization: float = 0.2,
+                     tikhonov_regularization: float = 0.2,
                      kernel: str = 'rbf',
                      **kernel_params)-> None:
-            self.tikhonov_regularization = tikhonov_regulraization
+            self.tikhonov_regularization = tikhonov_regularization
             self.kernel = build_kernel(kernel=kernel, kernel_params=kernel_params)
 
     #----------------------------------------------------------------
@@ -30,11 +30,11 @@ class FixedSizedLMClassifier(Model):
     def fit(self,
             X: NDArray,
             y: NDArray,
-            max_iterations: int = 100,
+            max_iterations: int = 300,
             window_size: int = 5,
             step_size: float = 0.5,
-            tolerance: float = 0.01,
-            percentage: float = 0.2):
+            tolerance: float = 0.001,
+            percentage: float = 0.8):
         """
         Interface do método
         Ação: Este método visa realizar a poda iterativa dos vetores

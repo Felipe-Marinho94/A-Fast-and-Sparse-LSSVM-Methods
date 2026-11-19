@@ -88,7 +88,7 @@ class AlternatingDirectionsMultipliers(Optimizer):
 
         alpha = 1 #termo de momento
 
-        "Pre-cálcula para salva tais operações"
+        "Pre-cálcula para salvar tais operações"
         AtA = A.T.dot(A)
         Aty = A.T.dot(y)
         Q = AtA + rho*np.identity(n)

@@ -13,7 +13,7 @@ from models.primal.LSSVM_ADMM.classifier import PrimalLassoClassifier
 #Base sintética pseudoaleatória
 style.use("fivethirtyeight")
  
-X, y = make_blobs(n_samples = 10000, centers = 2, 
+X, y = make_blobs(n_samples = 3000, centers = 2, 
                cluster_std = 4, n_features = 10)
  
 

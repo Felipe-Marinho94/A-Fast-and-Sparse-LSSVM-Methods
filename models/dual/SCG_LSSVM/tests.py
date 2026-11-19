@@ -1,8 +1,5 @@
 '''Script de testes para o modelo SCG_LSSVM'''
 
-#-------------------------------------
-# Carregando pacotes relevantes
-#-------------------------------------
 import numpy as np
 from sklearn.datasets import make_blobs, load_breast_cancer
 from sklearn.svm import SVC

@@ -16,7 +16,7 @@ from models.primal.RFSLM_LSSVM.classifier import ReducedFixedSizedLMClassifier
 #Base sintética pseudoaleatória
 style.use("fivethirtyeight")
  
-X, y = make_blobs(n_samples = 10000, centers = 2, 
+X, y = make_blobs(n_samples = 1000, centers = 2, 
                cluster_std = 4, n_features = 10)
  
 

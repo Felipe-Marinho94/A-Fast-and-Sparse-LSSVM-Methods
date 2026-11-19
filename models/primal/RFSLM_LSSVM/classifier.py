@@ -87,7 +87,7 @@ class ReducedFixedSizedLMClassifier(Model):
         for k in range(1, max_iterations+1):
             
             #Cálculo da matriz A e vetor b para o conjunto de vetores suporte
-            support_vector_kernel = build_kernel(kernel='rbf', kernel_params={'gamma': 0.5})
+            support_vector_kernel = build_kernel(kernel='rbf', kernel_params={'gamma': 0.5}).compute(X_vs)
             builder = BuildKKTSystem(kernel_matrix=support_vector_kernel, tikhonov_regularization=self.tikhonov_regularization)
             A, B = builder.build_classification(X_vs, y_vs)
 
